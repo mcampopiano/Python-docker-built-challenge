@@ -8,14 +8,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite.db'
 # initialize the database with the settings from app
 db = SQLAlchemy(app)
 
-class Budget_Item(db.Model):
+class BudgetItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     cost = db.Column(db.Float, nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
     recurring = db.Column(db.Boolean, nullable=False)
     due_date = db.Column(db.DateTime, nullable=True)
 
-
+    def __repr__(self):
+        return '<Budget_Item %r>' % self.id
 
 
 
