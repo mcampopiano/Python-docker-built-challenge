@@ -1,3 +1,5 @@
+from logging import exception
+from typing import get_type_hints
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -32,11 +34,6 @@ budgets_schema = BudgetItemSchema(many=True)
 
 ###### API #######
 
-# @app.route('/budgets', methods=['POST', 'GET'])
-# def get_budget_items():
-#     budget_itmes = BudgetItem.query.all()
-#     result = budgets_schema.dump(budget_itmes)
-#     return {"budget items": result}
 
 @app.route('/budgets', methods=['POST', 'GET'])
 def handle_requests():
@@ -62,6 +59,18 @@ def handle_requests():
         db.session.commit()
         result = budgets_schema.dump(budget_item.query.get(budget_item.id))
         return {"message": "Created a new budget item", "budget Item": result}
+
+@app.route('/budgets/<int:id>', methods=['DELETE', 'GET'])
+def handle_single_request_or_delete(id):
+    if request.method == 'DELETE':
+        item_to_delete = BudgetItem.query.get_or_404(id)
+
+        try:
+            db.session.delete(item_to_delete)
+            db.session.commit()
+            return {"message": "successfully deleted"}
+        except exception as ex:
+            return ex.messages
 
 
 
