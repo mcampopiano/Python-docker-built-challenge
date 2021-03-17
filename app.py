@@ -29,17 +29,41 @@ class BudgetItemSchema(Schema):
 
 budgets_schema = BudgetItemSchema(many=True)
 
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
 
 ###### API #######
 
-@app.route('/budgets')
-def get_budget_items():
-    budget_itmes = BudgetItem.query.all()
-    result = budgets_schema.dump(budget_itmes)
-    return {"budget items": result}
+# @app.route('/budgets', methods=['POST', 'GET'])
+# def get_budget_items():
+#     budget_itmes = BudgetItem.query.all()
+#     result = budgets_schema.dump(budget_itmes)
+#     return {"budget items": result}
+
+@app.route('/budgets', methods=['POST', 'GET'])
+def handle_requests():
+    if request.method == 'GET':
+        budget_itmes = BudgetItem.query.all()
+        result = budgets_schema.dump(budget_itmes)
+        return {"budget items": result}
+    elif request.method == 'POST':
+        json_data = request.get_json()
+        print(type(json_data))
+        try:
+            data = budgets_schema.load(json_data)
+        except ValidationError as err:
+            return err.messages, 422
+        name = data['name']
+        cost = data['cost']
+        recurring = data['recurring']
+        date_created = datetime.datetime.utcnow()
+        # due_date = data['dueDate']
+        budget_item = BudgetItem(name=name, cost=cost,recurring=recurring,
+        date_created=date_created)
+        db.session.add(budget_item)
+        db.session.commit()
+        result = budgets_schema.dump(budget_item.query.get(budget_item.id))
+        return {"message": "Created a new budget item", "budget Item": result}
+
+
 
 
 if __name__ == "__main__":
