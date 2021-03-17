@@ -27,16 +27,19 @@ class BudgetItemSchema(Schema):
     recurring = fields.Boolean()
     due_date = fields.DateTime()
 
-
+budgets_schema = BudgetItemSchema(many=True)
 
 # @app.route('/')
 # def index():
 #     return render_template('index.html')
 
-@app.route('/budgets', methods=['POST', 'GET'])
-def index():
-    if request.method == 'GET':
-        return "hello"
+###### API #######
+
+@app.route('/budgets')
+def get_budget_items():
+    budget_itmes = BudgetItem.query.all()
+    result = budgets_schema.dump(budget_itmes)
+    return {"budget items": result}
 
 
 if __name__ == "__main__":
