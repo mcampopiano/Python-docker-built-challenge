@@ -3,8 +3,9 @@
         {
             "previewLimit": 50,
             "driver": "SQLite",
-            "name": "Built db",
+            "name": "budget database",
             "database": "sqlite.db"
         }
-    ]
+    ],
+    "python.pythonPath": "/home/mcamp/.local/share/virtualenvs/Python-docker-built-challenge-VYztjUFt/bin/python"
 }
