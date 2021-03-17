@@ -53,12 +53,12 @@ def handle_requests():
         cost = data['cost']
         recurring = data['recurring']
         date_created = datetime.utcnow()
-        due_date = data['dueDate']
+        # due_date = data['dueDate']
         budget_item = BudgetItem(name=name, cost=cost,recurring=recurring,
         date_created=date_created)
         db.session.add(budget_item)
         db.session.commit()
-        result = budgets_schema.dump(budget_item.query.get(budget_item.id))
+        result = budget_schema.dump(budget_item.query.get(budget_item.id))
         return {"message": "Created a new budget item", "budget Item": result}
 
 @app.route('/budgets/<int:id>', methods=['DELETE', 'GET', 'PUT'])
@@ -86,7 +86,7 @@ def handle_single_request_or_delete(id):
         due_date = item_to_edit.due_date
         db.session.add(item_to_edit)
         db.session.commit()
-        result = budgets_schema.dump(item_to_edit.query.get(item_to_edit.id))
+        result = budget_schema.dump(item_to_edit.query.get(item_to_edit.id))
         return {"message": "Created a new budget item", "budget Item": result}
 
 
