@@ -53,7 +53,7 @@ def handle_requests():
         cost = data['cost']
         recurring = data['recurring']
         date_created = datetime.utcnow()
-        # due_date = data['dueDate']
+        due_date = data['dueDate']
         budget_item = BudgetItem(name=name, cost=cost,recurring=recurring,
         date_created=date_created)
         db.session.add(budget_item)
@@ -61,7 +61,7 @@ def handle_requests():
         result = budgets_schema.dump(budget_item.query.get(budget_item.id))
         return {"message": "Created a new budget item", "budget Item": result}
 
-@app.route('/budgets/<int:id>', methods=['DELETE', 'GET'])
+@app.route('/budgets/<int:id>', methods=['DELETE', 'GET', 'PUT'])
 def handle_single_request_or_delete(id):
     if request.method == 'DELETE':
         item_to_delete = BudgetItem.query.get_or_404(id)
@@ -72,6 +72,22 @@ def handle_single_request_or_delete(id):
             return {"message": "successfully deleted"}
         except exception as ex:
             return ex.messages
+    elif request.method == 'PUT':
+        json_data = request.get_json()
+        try:
+            data = budget_schema.load(json_data)
+        except ValidationError as err:
+            return err.messages, 422
+        item_to_edit = BudgetItem.query.get_or_404(id)
+        item_to_edit.name = data['name']
+        item_to_edit.cost = data['cost']
+        item_to_edit.recurring = data['recurring']
+        date_created = item_to_edit.date_created
+        due_date = item_to_edit.due_date
+        db.session.add(item_to_edit)
+        db.session.commit()
+        result = budgets_schema.dump(item_to_edit.query.get(item_to_edit.id))
+        return {"message": "Created a new budget item", "budget Item": result}
 
 
 
