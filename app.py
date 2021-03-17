@@ -29,7 +29,9 @@ class BudgetItemSchema(Schema):
     recurring = fields.Boolean()
     due_date = fields.DateTime()
 
+budget_schema = BudgetItemSchema()
 budgets_schema = BudgetItemSchema(many=True)
+
 
 
 ###### API #######
@@ -43,15 +45,14 @@ def handle_requests():
         return {"budget items": result}
     elif request.method == 'POST':
         json_data = request.get_json()
-        print(type(json_data))
         try:
-            data = budgets_schema.load(json_data)
+            data = budget_schema.load(json_data)
         except ValidationError as err:
             return err.messages, 422
         name = data['name']
         cost = data['cost']
         recurring = data['recurring']
-        date_created = datetime.datetime.utcnow()
+        date_created = datetime.utcnow()
         # due_date = data['dueDate']
         budget_item = BudgetItem(name=name, cost=cost,recurring=recurring,
         date_created=date_created)
